@@ -5,3 +5,7 @@ block content
   p Welcome to #{title}
   a(href = "/demo/captcha") 验证码例子
 
+  div
+    input#clip_text
+    button#clip_btn(data-clipboard-target="#clip_text") clip
+    input#clip_paste

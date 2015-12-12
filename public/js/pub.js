@@ -13,4 +13,16 @@ $(function () {
         },
         timeout: 60000
     });
+
+    $("#clip_btn").click(function () {
+        var self = $(this);
+        var clipboard = new Clipboard('#clip_btn');
+        clipboard.on('success', function(e) {
+            self.text('复制成功');
+            setTimeout(function () {
+                self.text('clip');
+            },200);
+        });
+
+    });
 });
