@@ -1,0 +1,23 @@
+{
+  "name": "flight",
+  "description": "",
+  "main": "",
+  "authors": [
+    "zhaopeng <zhaopeng@romens.cn>"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/ppzz/flight",
+  "moduleType": [],
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "public/bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "clipboard": "~1.5.5"
+  }
+}

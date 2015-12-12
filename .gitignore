@@ -29,4 +29,5 @@ node_modules
 #zp_add:
 .idea
 node_modules
+public/bower_components
 #end_zp_add
