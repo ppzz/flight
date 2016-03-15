@@ -26,7 +26,7 @@ router.post("/fakeErpMsgUrl", function (req, res) {
 
     res.json({
         status: 200,
-        msg: "this is a test",
+        msg: "this is a test aaaaa",
         data: req.body.msg
     });
 
@@ -39,15 +39,22 @@ router.post("/fakeErpAppCodeUrl", function (req, res) {
     console.log('-------------------------------------\n\n');
 
     var ttl = 120;
-    var appCode = "1234567890123";
-
-    res.json(
-        {
-            ttl: ttl,
-            appCode: appCode
+    var appCode = "12345678901234567890123456789012";
+    var feedback = {
+        status: 200,
+        msg: 'ok',
+        data: {
+            appCode: appCode,
+            ttl: ttl
         }
-    );
+    };
+    res.json(feedback);
 });
 
+router.post('/test/post', function (req, res) {
+    var temp = req.body;
+    console.log(temp);
+    res.json('ok');
+});
 
 module.exports = router;

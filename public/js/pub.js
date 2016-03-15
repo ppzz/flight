@@ -25,4 +25,29 @@ $(function () {
         });
 
     });
+
+    $('#test-post').click(function () {
+        var data = {
+            name: 'zhaopeng',
+            age: 23,
+            address: "meinian",
+            score: {
+                english: 123,
+                math: 100
+            }
+        };
+        $.ajax({
+            type: 'post',
+            url: '/test/post',
+            data: {data:JSON.stringify(data)},
+            dataType: 'json',
+            success:function() {
+
+            },
+            error: function () {
+
+            }
+        });
+
+    });
 });
