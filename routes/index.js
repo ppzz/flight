@@ -18,6 +18,10 @@ router.get("/demo/captcha", function (req, res) {
     res.render("demo/captcha", {title: "验证码"});
 });
 
+router.get("/demo/socket", function (req, res) {
+    res.render("demo/socket", {title: "socket"});
+});
+
 router.post("/fakeErpMsgUrl", function (req, res) {
     var data = req.body;
     console.log('-------------------------------------');

@@ -1,4 +1,6 @@
 $(function () {
+    var socket  = null;
+
     $.ajax({
         type: 'get',
         url: "/captcha",
@@ -49,5 +51,31 @@ $(function () {
             }
         });
 
+    });
+
+    $("#socket-connect").click(function () {
+        socket = io("http://127.0.0.1:8888");
+        socket.on("connect", function () {
+            alert('456')
+        });
+    });
+
+    $("#socket-add-connect").click(function () {
+        socket.on('testEvent2', function (data) {
+            alert(data);
+        });
+    });
+
+    $("#socket-testEvent").click(function () {
+        if ( socket === null) {
+            return alert('null socket');
+        }
+        socket.emit('EVENT1', "hello world");
+    });
+
+    $("#socket-disconnect").click(function () {
+        socket.disconnect(function () {
+            alert('234');
+        });
     });
 });

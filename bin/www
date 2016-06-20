@@ -1,21 +1,51 @@
 #!/usr/bin/env node
 
+/* jshint strict: true */
+
 var app = require('../app');
 var debug = require('debug')('flight:server');
 var http = require('http');
 
-var port = normalizePort(process.env.PORT || '3001');
+
+var _ = require("underscore");
+var port = normalizePort(process.env.PORT || '8888');
 app.set('port', port);
 
 
 var server = http.createServer(app);
 
+var io = require("socket.io")(server);
+
+io.on("connect", function (socket) {
+  var socketId = socket.client.id;
+  console.log('create connection,  id:', socketId);
+
+
+  socket.on('testEvent', function (data) {
+    console.log('receive event: testEvent, \n\tid :', socketId, ' \n\tdata: ', data);
+
+    socket.emit('testEvent2', ' hello world again.')
+  });
+
+  socket.on("auth", function (data) {
+    console.log("receive event: auth, \n\tid: ", socketId, "\n\tdata: ", data);
+    
+    
+    
+  });
+  socket.on("disconnect", function () {
+    console.log('destory connection, id: ', socketId);
+  });
+});
+
+
 server.listen(port);
+console.log("listening on port :", port);
 server.on('error', onError);
 server.on('listening', onListening);
 
 function normalizePort(port) {
-  var port = parseInt(port, 10);   //表示将val的值解析成10进制的数字.
+  port = parseInt(port, 10);   //表示将val的值解析成10进制的数字.
 
   if (isNaN(port)) {
     // named pipe

@@ -3,7 +3,10 @@ extends layout
 block content
   h1= title
   p Welcome to #{title}
-  a(href = "/demo/captcha") 验证码例子
+  div
+    a(href = "/demo/captcha") 验证码例子
+  div
+    a(href = "/demo/socket") socket.ioDEMO
 
   div
     input#clip_text
