@@ -30,4 +30,5 @@ node_modules
 .idea
 node_modules
 public/bower_components
+.DS_Store
 #end_zp_add

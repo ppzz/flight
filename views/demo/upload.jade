@@ -1,0 +1,19 @@
+extends ../layout
+
+block content
+    div
+        h3 Ajax文件上传DEMO
+    div
+        form#uploadFrom(action='/demo/upload', method="post")
+            img#uploadImg(style="width:100px; height:100px")
+            input#uploadInput(type="file", name='file')
+            input(type="submit")
+
+
+    div
+        div
+            input#uploadInput2(type="file", name="file")
+            input#uploadBtn(value="上传", type="button")
+        div
+
+

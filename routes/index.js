@@ -1,7 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var ccap = require("ccap");
-
+var fs = require("fs");
+var formidable = require("formidable");
 router.get('/', function (req, res, next) {
     res.render('index', {title: 'Express'});
 });
@@ -20,6 +21,52 @@ router.get("/demo/captcha", function (req, res) {
 
 router.get("/demo/socket", function (req, res) {
     res.render("demo/socket", {title: "socket"});
+});
+
+router.get("/demo/upload", function (req, res) {
+    res.render("demo/upload", {title: "upload"});
+});
+
+router.post("/demo/upload", function (req, res) {
+    console.log("in post upload");
+
+    var messasge = null;
+    var form = new formidable.IncomingForm();
+    form.encoding = "UTF-8";
+    form.uploadDir = 'public/upload/';
+    form.keepExtensions = true;
+    form.maxFieldsSize = 2 * 1024 * 1024;
+    form.parse(req, function (error, fields, files) {
+        if (error) {
+            console.log(error);
+        }
+        console.log(files);
+
+        var fileName = files.upload.name;
+        var nameArray = fileName.split(',');
+        var type = nameArray[nameArray.length - 1];
+        var name = '';
+        for (var i =0;i<nameArray.length- 1; i++ ){
+            name = name + nameArray[i];
+        }
+        var timeStamp = new Date().getTime();
+
+        var avatarName = name + timeStamp + "." + type;
+        var newPath = "public/file/" + avatarName;
+        fs.rename(files.upload.path, newPath, function (error, result) {
+            if (error) {
+                return console.log("error in rename file ");
+            }
+            console.log('ok   success rename file ');
+            res.json({
+                status: 200,
+                msg:'收到上传数据',
+                data:{
+                    url:newPath
+                }
+            });
+        });
+    });
 });
 
 router.post("/fakeErpMsgUrl", function (req, res) {
