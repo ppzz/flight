@@ -34,5 +34,5 @@ public/bower_components
 static
 public/upload
 public/file
-
+*.log
 #end_zp_add
