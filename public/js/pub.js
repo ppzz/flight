@@ -159,9 +159,11 @@ $(function () {
     $("div").delegate("#uploadBtn", "click", function () {
         if (window.FormData) {
             var formData = new FormData();
-            formData.append('upload', $("#uploadInput2")[0].files[0]);
+            formData.append('image', $("#uploadInput2")[0].files[0]);
             $.ajax({
-                url: "/demo/upload",
+                // url: "/v1/demo/image",
+                // url: "http://127.0.0.1:3300/api/v1/image/abc",
+                url: "http://192.168.100.28:3300/api/v1/image",
                 type: "post",
                 data: formData,
                 processData: false, //告诉jQuery不要去处理发送的数据
@@ -188,4 +190,23 @@ $(function () {
             // xhr.send(formData);
         }
     });
+    // $("div").delegate("#uploadBtn2", "click", function () {
+    //     if (window.FormData) {
+    //         var formData = new FormData();
+    //         formData.append('upload', $("#uploadInput2")[0].files[0]);
+    //         $.ajax({
+    //             url: "/v1/demo/image",
+    //             type: "post",
+    //             data: formData,
+    //             processData: false, //告诉jQuery不要去处理发送的数据
+    //             contentType: false,  //告诉jQuery不要去设置Content-Type请求头
+    //             success:function (feedback) {
+    //                 alert(JSON.stringify(feedback));
+    //             },
+    //             error:function (data) {
+    //                 alert(JSON.stringify(data));
+    //             }
+    //         });
+    //     }
+    // });
 });

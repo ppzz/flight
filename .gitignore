@@ -31,4 +31,8 @@ node_modules
 node_modules
 public/bower_components
 .DS_Store
+static
+public/upload
+public/file
+
 #end_zp_add

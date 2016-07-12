@@ -6,6 +6,7 @@
     "start": "supervisor ./bin/www"
   },
   "dependencies": {
+    "async": "^1.5.2",
     "body-parser": "~1.12.0",
     "ccap": "^0.6.4",
     "chai": "^3.4.0",
@@ -15,11 +16,13 @@
     "express": "~4.12.2",
     "formidable": "^1.0.17",
     "jade": "~1.9.2",
+    "js-yaml": "^3.6.1",
     "mocha": "^2.3.3",
     "morgan": "~1.5.1",
     "serve-favicon": "~2.2.0",
     "socket.io": "^1.4.6",
     "stack-trace": "0.0.9",
+    "swagger-tools": "^0.10.1",
     "underscore": "^1.8.3"
   }
 }

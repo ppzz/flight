@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var ccap = require("ccap");
 var fs = require("fs");
+var path = require("path");
 var formidable = require("formidable");
 router.get('/', function (req, res, next) {
     res.render('index', {title: 'Express'});
@@ -28,45 +29,129 @@ router.get("/demo/upload", function (req, res) {
 });
 
 router.post("/demo/upload", function (req, res) {
-    console.log("in post upload");
+    var now = new Date();
 
-    var messasge = null;
-    var form = new formidable.IncomingForm();
-    form.encoding = "UTF-8";
-    form.uploadDir = 'public/upload/';
-    form.keepExtensions = true;
-    form.maxFieldsSize = 2 * 1024 * 1024;
-    form.parse(req, function (error, fields, files) {
+    var filesize = 7 * 1024 * 1024;
+    var fileType = '';
+    var dir = "static/upload/image/" + now.toLocaleDateString() +'/' + now.getHours();
+    var cachePath = "static/upload/cache/";
+
+
+    mkdir(dir, function (error) {
         if (error) {
             console.log(error);
+            return;
         }
-        console.log(files);
 
-        var fileName = files.upload.name;
-        var nameArray = fileName.split(',');
-        var type = nameArray[nameArray.length - 1];
-        var name = '';
-        for (var i =0;i<nameArray.length- 1; i++ ){
-            name = name + nameArray[i];
-        }
-        var timeStamp = new Date().getTime();
-
-        var avatarName = name + timeStamp + "." + type;
-        var newPath = "public/file/" + avatarName;
-        fs.rename(files.upload.path, newPath, function (error, result) {
+        var form = new formidable.IncomingForm();
+        form.encoding = "UTF-8";
+        form.uploadDir = cachePath;
+        form.keepExtensions = true;
+        form.maxFieldsSize = filesize;
+        form.parse(req, function (error, fields, files) {
             if (error) {
-                return console.log("error in rename file ");
+                console.log(error);
             }
-            console.log('ok   success rename file ');
-            res.json({
-                status: 200,
-                msg:'收到上传数据',
-                data:{
-                    url:newPath
+            // console.log(files);
+
+            var fileName = files.upload.name;
+            var nameArray = fileName.split(',');
+            var type = nameArray[nameArray.length - 1];
+            var name = '';
+            for (var i =0;i<nameArray.length- 1; i++ ){
+                name = name + nameArray[i];
+            }
+            var timeStamp = new Date().getTime();
+
+            var avatarName = name + timeStamp + "." + type;
+            var newPath = dir + "/" + avatarName;
+            fs.rename(files.upload.path, newPath, function (error, result) {
+                if (error) {
+                    return console.log("error in rename file ");
                 }
+                console.log('ok   success rename file ');
+                res.json({
+                    status: 200,
+                    msg:'收到上传数据',
+                    data:{
+                        url:newPath
+                    }
+                });
             });
         });
+
+
+
+
     });
+
+
+
+
+    //
+    // var now = new Date();
+    //
+    // var filesize = 7 * 1024 * 1024;
+    // var fileType = '';
+    // var dir = "static/upload/image/" + now.toLocaleDateString() +'/' + now.getHours();
+    // var cachePath = "static/upload/cache/";
+    //
+    //
+    // mkdir(dir, function (error) {
+    //     if (error) {
+    //         console.log(error);
+    //         return ;
+    //     }
+    //
+    //     var form = new formidable.IncomingForm();
+    //     form.encoding = "UTF-8";
+    //     form.uploadDir = cachePath;
+    //     form.keepExtensions = true;
+    //     form.maxFieldsSize = filesize;
+    //
+    //     console.log(req.files);
+    //
+    //     console.log(Object.keys(req));
+    //     form.parse(req, function (error, fields, files) {
+    //         if (error) {
+    //             console.log(error);
+    //             console.log('----------------');
+    //         }
+    //
+    //
+    //         console.log(files);
+    //         console.log('--------------------------------------------------------');
+    //
+    //
+    //
+    //         var fileName = files.upload.name;
+    //         var nameArray = fileName.split(',');
+    //         var type = nameArray[nameArray.length - 1];
+    //         var name = '';
+    //         for (var i =0;i<nameArray.length- 1; i++ ){
+    //             name = name + nameArray[i];
+    //         }
+    //         var timeStamp = new Date().getTime();
+    //         var avatarName = name + timeStamp + "." + type;
+    //         var newPath = dir + "/" + avatarName;
+    //
+    //         fs.rename(files.upload.path, newPath, function (error, result) {
+    //             if (error) {
+    //                 return console.log("error in rename file ");
+    //             }
+    //             console.log('ok   success rename file ');
+    //             res.json({
+    //                 status: 200,
+    //                 msg:'收到上传数据',
+    //                 data:{
+    //                     url: newPath
+    //                 }
+    //             });
+    //         });
+    //     });
+    // });
+
+
 });
 
 router.post("/fakeErpMsgUrl", function (req, res) {
@@ -109,3 +194,25 @@ router.post('/test/post', function (req, res) {
 });
 
 module.exports = router;
+
+
+var mkdir = function (dirpath, callback) {
+    var createDir = function (dirPath, callback) {
+        fs.exists(dirPath, function (exists) {
+            if (exists) {
+                callback(dirPath);
+            } else {
+                createDir(path.dirname(dirPath), function () {
+                    fs.mkdir(dirPath, callback);
+                });
+            }
+        });
+    };
+
+    fs.exists(dirpath, function (flag) {
+        if (flag) {
+            return callback(null, dirpath);
+        }
+        createDir(dirpath, callback);
+    });
+};

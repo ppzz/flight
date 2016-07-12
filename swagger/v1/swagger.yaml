@@ -1,0 +1,56 @@
+---
+swagger: "2.0"
+info:
+  description: "Move your app forward with the Uber API"
+  version: "1.0.0"
+  title: "Uber API"
+host: "127.0.0.1:8888"
+basePath: "/v1"
+schemes:
+- "https"
+produces:
+- "application/json"
+paths:
+  /demo/image:
+    post:
+      tags:
+      - "image"
+      summary: "图片上传接口\n"
+      description: "校验用户输入的验证码是否正确\n"
+      operationId: "postImage"
+      parameters:
+      - name: "image"
+        in: "formData"
+        description: "用户上传的图片"
+        required: true
+        type: "file"
+      responses:
+        200:
+          description: "返回验证码校验的信息"
+          schema:
+            $ref: "#/definitions/Image"
+        default:
+          description: "unexpected error\n"
+          schema:
+            $ref: "#/definitions/Error"
+      x-swagger-router-controller: "Image"
+definitions:
+  Image:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+        description: "name of image"
+      url:
+        type: "string"
+        description: "url of image"
+  Error:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+      message:
+        type: "string"
+      fields:
+        type: "string"
