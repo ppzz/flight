@@ -34,8 +34,21 @@ io.on("connect", function (socket) {
     
   });
   socket.on("disconnect", function () {
-    console.log('destory connection, id: ', socketId);
+    console.log('event: disconnect    ' +  socketId);
   });
+
+  socket.on("connection", function (socket) {
+    console.log('event: connection    ' + socket);
+  });
+
+  socket.on("message", function (message) {
+    console.log('event: message       ' + message);
+  });
+
+  socket.on("anything", function (data) {
+    console.log('event: anything      ' + data);
+  });
+
 });
 
 
