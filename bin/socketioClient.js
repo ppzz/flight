@@ -2,7 +2,7 @@ var _ = require("lodash");
 var io = require("socket.io-client");
 var fs = require("fs");
 
-var socketEvents = require('../module/socketEvent');
+var socketEvents = require('../module/socketioClientEvents');
 var serverUrl = "http://zhaopeng:3300";
 // var serverUrl = "http://192.168.100.14:3300";
 
