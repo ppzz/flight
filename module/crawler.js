@@ -20,12 +20,9 @@ Crawler.prototype.getWeiBoFans = function () {
         console.log('--\n',key,'\n',res[key],'\n--');
       }else{
         console.log('--\n',key,'\n','\033[33mfunction\033[0m','\n--');
-
       }
-
     }
-    //console.log('-------------');
-    //console.log('--\n',res.headers,'\n--');
+
     res.on('data', function resOnData(data) {
       html += data;
     });
@@ -45,4 +42,9 @@ Crawler.prototype.getWeiBoFans = function () {
   return fansNumber;
 };
 
+Crawler.prototype.downHtml = function (url) {
+  http.get(url, function (res) {
+    console.log(res);
+  });
+};
 module.exports = Crawler;

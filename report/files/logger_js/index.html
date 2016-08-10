@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - logger.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>logger.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">76.02</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">177</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">35.07</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.94</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">// log level:
+var TRACE = 1;
+var DEBUG = 2;
+var INFO = 3;
+var WARN = 4;
+var ERROR = 5;
+var FATAL = 6;
+var POSITION = 1;
+
+//log color:
+var NOCOLOR = &#039;&#039;;
+var DEFAULTCOLOR = &#039;\033[0m&#039;;
+var RED = &#039;\033[31m&#039;;
+var GREEN = &#039;\033[32m&#039;;
+var ORANGE = &#039;\033[33m&#039;;
+var BLUE = &#039;\033[34m&#039;;
+var PURPLE = &#039;\033[35m&#039;;
+var CYAN = &#039;\033[36m&#039;;
+var WHITE = &#039;\033[37m&#039;;
+
+
+var ColorController = {
+  TRACE: GREEN,
+  DEBUG: GREEN,
+  INFO: CYAN,
+  WARN: ORANGE,
+  ERROR: RED,
+  FATAL: RED,
+  JSON: BLUE,
+  POSITION: PURPLE
+};
+
+//modules:
+var stackTracer = require(&#039;stack-trace&#039;);
+
+function Logger(logLevel, isColorizedLog) {
+  this._logLevel = logLevel || 0;
+  this._isColorizedLog = isColorizedLog || false;
+}
+
+var _timeStamp = function () {
+  var now = new Date();
+  return now.getFullYear() + &#039;-&#039; +
+    (&quot;0&quot; + (now.getMonth() + 1)).slice(-2) + &#039;-&#039; +
+    (&quot;0&quot; + (now.getDate() + 1)).slice(-2) + &#039; &#039; +
+    (&quot;0&quot; + now.getHours()).slice(-2) + &#039;:&#039; +
+    (&quot;0&quot; + now.getMinutes()).slice(-2) + &#039;:&#039; +
+    (&quot;0&quot; + now.getSeconds()).slice(-2) + &#039;.&#039; +
+    (&quot;000&quot; + now.getMilliseconds()).slice(-3);
+};
+
+var _printMsg = function (highLightColor, type, msg, isColorized) {
+  var defaultColor = DEFAULTCOLOR;
+  var stack = stackTracer.get();
+  var caller = stack[2];
+  msg = msg || &#039;.&#039;;
+  if (!isColorized) {
+    defaultColor = NOCOLOR;
+    highLightColor = NOCOLOR;
+  }
+  console.log(
+    &quot;[&quot; , highLightColor , type , defaultColor , &quot;] &quot; ,
+    &quot;[&quot; , highLightColor , _timeStamp() , defaultColor , &quot;] &quot; ,
+    &quot;[&quot; , highLightColor , caller.getFileName().replace(__dirname, &#039;&#039;) ,
+    &quot; #&quot; , caller.getLineNumber() ,
+    &quot;:&quot; , caller.getColumnNumber() ,
+    &quot; @&quot; , caller.getFunctionName() , defaultColor , &quot;] &quot; ,
+    &quot;&quot; , highLightColor , type , &#039;: &#039; , msg , defaultColor);
+};
+
+var _printPosition = function (highLightColor, type, msg, isColorized) {
+  var defaultColor = DEFAULTCOLOR;
+  var stack = stackTracer.get();
+  var caller = stack[2];
+  msg = msg || &#039;.&#039;;
+  if (!isColorized) {
+    defaultColor = NOCOLOR;
+    highLightColor = NOCOLOR;
+  }
+  console.log(
+    &quot;[&quot; + highLightColor + type + defaultColor + &quot;] &quot; +
+    &quot;[&quot; + _timeStamp() + &quot;] &quot; +
+    &quot;[&quot; + highLightColor + caller.getFileName().replace(__dirname, &#039;&#039;) +
+    &quot; #&quot; + caller.getLineNumber() +
+    &quot;:&quot; + caller.getColumnNumber() +
+    &quot; @&quot; + caller.getFunctionName() + defaultColor + &quot;] &quot; +
+    &quot;&quot; + highLightColor + type +
+    &quot;: &quot; + caller.getFunctionName() +
+    &quot; msg: &quot; + msg + defaultColor);
+};
+
+Logger.prototype.getLevel = function () {
+  return this._logLevel;
+};
+Logger.prototype.setLevel = function (logLevel) {
+  this._logLevel = logLevel;
+};
+Logger.prototype.getIsColorizedLog = function () {
+  return this._isColorizedLog;
+};
+Logger.prototype.setIsColorizedLog = function (isColorizedLog) {
+  this._isColorizedLog = isColorizedLog;
+  return this._isColorizedLog;
+};
+
+//next function to print msg with different color:
+Logger.prototype.trace = function (msg) {
+  if (this.getLevel() &lt; TRACE) {
+    _printMsg(ColorController.TRACE, &#039;TRACE&#039;, msg, this._isColorizedLog);
+  }
+};
+
+Logger.prototype.debug = function (msg) {
+  if (this.getLevel() &lt; DEBUG) {
+    _printMsg(ColorController.DEBUG, &quot;DEBUG&quot;, msg, this._isColorizedLog);
+  }
+};
+
+Logger.prototype.info = function (msg) {
+  if (this.getLevel() &lt; INFO) {
+    _printMsg(ColorController.INFO, &quot;INFO&quot;, msg, this._isColorizedLog);
+  }
+};
+
+Logger.prototype.warn = function (msg) {
+  if (this.getLevel() &lt; WARN) {
+    _printMsg(ColorController.WARN, &quot;WARN&quot;, msg, this._isColorizedLog);
+  }
+};
+
+Logger.prototype.error = function (msg) {
+  if (this.getLevel() &lt; ERROR) {
+    _printMsg(ColorController.ERROR, &quot;ERROR&quot;, msg, this._isColorizedLog);
+  }
+};
+
+Logger.prototype.fatal = function (msg) {
+  if (this.getLevel() &lt; FATAL) {
+    _printMsg(ColorController.FATAL, &quot;FATAL&quot;, msg, this._isColorizedLog);
+  }
+};
+
+Logger.prototype.json = function () {
+  if (arguments.length === 1) {
+    if (typeof arguments[0] !== &quot;string&quot; &amp;&amp; typeof arguments[0] !== &quot;number&quot;) {
+      arguments[0] = JSON.stringify(arguments[0]);
+    }
+    _printMsg(ColorController.JSON, &quot;JSON&quot;, arguments[0], this._isColorizedLog);
+    return;
+  }
+
+  if (typeof arguments[1] !== &quot;string&quot; &amp;&amp; typeof arguments[1] !== &quot;number&quot;) {
+    arguments[1] = JSON.stringify(arguments[1]);
+  }
+  _printMsg(ColorController.JSON, &quot;JSON&quot;, &quot;KEY: &quot; + arguments[0] + &quot;, VALUE: &quot; + arguments[1], this._isColorizedLog);
+};
+
+//next function to print status with call:
+Logger.prototype.enter = function (msg) {
+  if (this.getLevel() &lt; POSITION) {
+    _printPosition(ColorController.POSITION, &quot;ENTER&quot;, msg, this._isColorizedLog)
+  }
+};
+
+Logger.prototype.leave = function (msg) {
+  if (this.getLevel() &lt; POSITION) {
+    _printPosition(ColorController.POSITION, &quot;LEAVE&quot;, msg, this._isColorizedLog)
+  }
+};
+
+Logger.prototype.footPrint = function (msg) {
+  if (this.getLevel() &lt; POSITION) {
+    _printPosition(ColorController.POSITION, &quot;FOOTPRINT&quot;, msg, this._isColorizedLog)
+  }
+};
+
+module.exports = Logger;</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ cyclomatic }} <br>
+    Length : {{ halstead.length }} <br>
+    Difficulty : {{ halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>
