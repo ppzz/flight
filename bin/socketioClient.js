@@ -3,7 +3,7 @@ var io = require("socket.io-client");
 var fs = require("fs");
 
 var socketEvents = require('../module/socketioClientEvents');
-var serverUrl = "http://zhaopeng:3300";
+var serverUrl = "http://zhaopeng:6200";
 // var serverUrl = "http://192.168.100.14:3300";
 
 var option = {
@@ -27,4 +27,9 @@ _.each(events, function (item) {
         clientEvents[item](data);
     });
 });
+
+setTimeout(function () {
+    console.log('to disconnect');
+    socket.disconnect();
+},3000);
 

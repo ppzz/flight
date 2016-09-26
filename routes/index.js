@@ -4,6 +4,8 @@ var ccap = require("ccap");
 var fs = require("fs");
 var path = require("path");
 var formidable = require("formidable");
+var ps = require("pubsub-js");
+
 router.get('/', function (req, res, next) {
     res.render('index', {title: 'Express'});
 });
@@ -192,6 +194,44 @@ router.post('/test/post', function (req, res) {
     console.log(temp);
     res.json('ok');
 });
+
+
+var getRES = function getRES(req, res) {
+
+    // save status: if response
+    var hasRes = false;
+
+    // subscribe event res
+    ps.subscribe('res', function subscribeRES(msg, data) {
+        if (hasRes) {
+            return;
+        }
+        res.json(data);
+        hasRes = true;
+
+        // release source
+        ps.unsubscribe('res');
+    });
+
+    // send a default response after a while
+    setTimeout(function () {
+        if (hasRes) {
+            return;
+        }
+        res.json({text: 'default'});
+        hasRes = true;
+        ps.unsubscribe('res');
+    }, 4000);
+};
+var postRES = function postRES(req, res) {
+    var text = req.body.text;
+
+    // publish event res
+    ps.publish('res', {text: text});
+    res.json({msg: 'done'});
+};
+router.get('/sub', getRES);
+router.post('/sub', postRES);
 
 module.exports = router;
 

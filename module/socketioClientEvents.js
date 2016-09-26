@@ -58,7 +58,7 @@ var clientEvents = {
 
     pong: function (number) {
         printLog("事件: pong: " + now() + " 毫秒数:" + number);
-    },
+    }
 };
 
 var serverEvents = {};

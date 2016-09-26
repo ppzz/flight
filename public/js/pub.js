@@ -54,7 +54,7 @@ $(function () {
     });
 
     $("#socket-connect").click(function () {
-        socket = io("http://127.0.0.1:8888");
+        socket = io("http://127.0.0.1:6200");
         socket.on("connect", function () {
             alert('456')
         });
@@ -209,4 +209,42 @@ $(function () {
     //         });
     //     }
     // });
+
+    $("div").delegate("#wait_res", "click", function () {
+
+        $.ajax({
+            type: 'get',
+            url: "/sub" + "?" + Math.random(),
+            dataType: 'text',
+            processData: false,
+            contentType: 'application/json',
+            success: function (resText) {
+                $("#wait_res_text").val(resText);
+            },
+            error: function (req, status, ex) {
+                alert('wait sub error');
+            },
+            timeout: 60000
+        });
+    });
+
+    $("div").delegate("#make_res", "click", function () {
+        var text = $("#make_res_text").val();
+        text = text || '123';
+        var data = {
+            text: text
+        };
+        $.ajax({
+            type: 'post',
+            url: '/sub',
+            data: data,
+            dataType: 'json',
+            success: function () {
+                $("#make_res_text").val('');
+            },
+            error: function () {
+                alert("make sub error");
+            }
+        });
+    });
 });

@@ -7,7 +7,7 @@ describe("class: Person", function () {
         it("should return a instance", function () {
 
             var per = new Person();
-        var per2 = new Person();
+            var per2 = new Person();
 
             var isPerson = per instanceof Person;
             var isPerson2 = per2 instanceof Person;
@@ -40,7 +40,7 @@ describe("class: Person", function () {
                 return 25;
             };
             var per2 = new Person();
-            
+
             expect(per.getAge()).to.equal(per2.getAge());
             expect(per.getAge()).to.equal(25);
         });
@@ -55,7 +55,7 @@ describe("class: Person", function () {
         });
         it("function: speak", function () {
             var per = new Person('zhaopeng');
-            
+
             var result = per.speak();
             expect(result).to.equal('zhaopeng');
         });

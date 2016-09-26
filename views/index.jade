@@ -5,13 +5,23 @@ block content
   p Welcome to #{title}
   div
     a(href = "/demo/captcha") 验证码例子
+  br
   div
     a(href = "/demo/socket") socket.ioDEMO
+  br
   div
     a(href = "/demo/upload") upload.Demo
+  br
 
   div
     input#clip_text
     button#clip_btn(data-clipboard-target="#clip_text") clip
     input#clip_paste
     button#test-post test/post
+  br
+  div
+    button#wait_res 等待响应
+    input#wait_res_text
+
+    input#make_res_text
+    button#make_res 同意响应
